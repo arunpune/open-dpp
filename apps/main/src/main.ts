@@ -128,8 +128,8 @@ async function bootstrap() {
   });
   app.enableCors({
     credentials: true,
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+    origin: process.env.OPEN_DPP_URL,
+    methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   });
   app.useGlobalFilters(
     new NotFoundInDatabaseExceptionFilter(),

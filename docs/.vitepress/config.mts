@@ -45,6 +45,7 @@ export default defineConfig({
               { text: "AI Integration", link: "/guides/ai" },
               { text: "Development", link: "/guides/development" },
               { text: "Production setup", link: "/guides/production-setup" },
+              { text: "Deployment configuration", link: "/guides/deployment-configuration" },
             ],
           },
         ],

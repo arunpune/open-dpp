@@ -61,49 +61,69 @@ The production container serves the built frontend and runs the NestJS backend. 
 
 ## Deployment flowchart
 
+The following Mermaid diagram shows how users, the application container, persistent storage, email, AI, and backups interact. VitePress uses Markdown-It for Markdown rendering, so Mermaid support must be enabled by the documentation site's Mermaid integration or plugin for this block to render as a diagram rather than source code. citeturn0search2turn0search5
+
+```mermaid
+flowchart TD
+    U[Users] -->|HTTPS| URL[Public application URL]
+    URL --> R[Render Web Service]
+
+    subgraph APP[Production Docker container]
+        R --> C[Vue frontend]
+        R --> API[NestJS API]
+        API --> AUTH[Authentication and sessions]
+        API --> WS[REST API and WebSockets]
+    end
+
+    API -->|Mongoose connection| DB[(MongoDB Atlas)]
+    DB --> B[Database backups]
+    API -->|S3-compatible API| R2[(Cloudflare R2)]
+    R2 --> MEDIA[DPP files and profile pictures]
+    API -->|SMTP or HTTPS email API| MAIL[Email provider]
+    API -->|Optional API calls| AI[Mistral AI]
+    GH[GitHub repository] -->|Push triggers deployment| R
+
+    classDef external fill:#eef6ff,stroke:#2563eb,stroke-width:1px;
+    classDef app fill:#ecfdf5,stroke:#059669,stroke-width:1px;
+    class U,URL,DB,R2,MAIL,AI,GH,B,MEDIA external;
+    class R,C,API,AUTH,WS app;
+```
+
+### Flow explanation
+
+1. Users access the public HTTPS URL.
+2. Render runs the Docker container containing the Vue frontend and NestJS backend.
+3. The backend stores structured data such as users, sessions, organizations, passports, and metadata in MongoDB Atlas.
+4. Uploaded DPP files and profile pictures are stored in Cloudflare R2 instead of the temporary application filesystem.
+5. The backend sends verification, reset, and notification emails through the configured email provider.
+6. Optional AI functionality calls Mistral AI.
+7. GitHub remains the source of truth and can trigger a new Render deployment when changes are pushed.
+8. MongoDB backups protect the database independently from the application host.
+
+### Text-only fallback
+
+If the documentation site does not have Mermaid rendering enabled, the architecture is:
+
 ```text
-                         Users
-                           |
-                           v
-                 HTTPS public application URL
-                           |
-                           v
-       +---------------------------------------------+
-       | Render Web Service                         |
-       |                                             |
-       | Vue frontend + NestJS API in Docker        |
-       | Authentication, REST API, WebSockets       |
-       +-------------------+-------------------------+
-                           |
-          +----------------+----------------+
-          |                                 |
-          v                                 v
-+---------------------+           +----------------------+
-| MongoDB Atlas       |           | Cloudflare R2        |
-|                     |           |                      |
-| Users, sessions,    |           | DPP files, media,    |
-| organizations,      |           | profile pictures     |
-| passports, metadata |           |                      |
-+---------------------+           +----------------------+
-          |
-          v
-   Database backups
+Users
+  |
+  v
+HTTPS public URL
+  |
+  v
+Render Web Service
+  |
+  +--> Vue frontend + NestJS backend
+  |
+  +--> MongoDB Atlas ----> Database backups
+  |
+  +--> Cloudflare R2 ----> DPP files and profile pictures
+  |
+  +--> Email provider
+  |
+  +--> Optional Mistral AI
 
-                           |
-                           v
-                 +----------------------+
-                 | Email provider       |
-                 |                      |
-                 | Verification, reset,|
-                 | notification emails  |
-                 +----------------------+
-
-                           |
-                           v
-                 +----------------------+
-                 | Mistral AI           |
-                 | Optional AI features |
-                 +----------------------+
+GitHub repository ----> Render deployment
 ```
 
 ## Component responsibilities
@@ -236,7 +256,7 @@ Email provider
 
 #### Estimated cost
 
-Atlas Flex currently costs between `$8` and `$30` for 30 days of usage, with 5 GB storage, 100 operations/second included in the base price, and a monthly cap. At a planning conversion of `$1 = ₹90`, that is approximately `₹720–₹2,700/month`. The actual invoice can differ. 
+Atlas Flex currently costs between `$8` and `$30` for 30 days of usage, with 5 GB storage, 100 operations/second included in the base price, and a monthly cap. At a planning conversion of `$1 = ₹90`, that is approximately `₹720–₹2,700/month`. The actual invoice can differ.
 
 | Component | Monthly cost | Notes |
 | --- | ---: | --- |

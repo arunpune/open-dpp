@@ -46,6 +46,7 @@ export default defineConfig({
               { text: "Development", link: "/guides/development" },
               { text: "Production setup", link: "/guides/production-setup" },
               { text: "Deployment configuration", link: "/guides/deployment-configuration" },
+              { text: "Deployment stack and costs", link: "/guides/deployment-stack-and-costs" },
             ],
           },
         ],

@@ -38,7 +38,7 @@ Estimated base cost:
 
 ```text
 Atlas Flex: $8–$30/month
-Approximately ₹720–₹2,700/month at a planning rate of ₹90 per US dollar
+Approximately ₹760–₹2,850/month at a planning rate of ₹95 per US dollar
 ```
 
 The final INR amount depends on the exchange rate, taxes, payment-provider charges, and actual usage. Confirm the price in each provider's dashboard before purchasing.
